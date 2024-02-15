@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: password
+    driver-class-name: org.h2.Driver
+    generate-unique-name: false
+    name: my-datasource
+  h2:
+    console:
+      enabled: true
+  jpa:
+    defer-datasource-initialization: true
+
+app:
+  jwt:
+    base64-secret: ZmQ0ZGI5NjQ0MDQwY2I4MjMxY2Y3ZmI3MjdhN2ZmMjNhODViOTg1ZGE0NTBjMGM4NDA5NzYxMjdjOWMwYWRmZTBlZjlhNGY3ZTg4Y2U3YTE1ODVkZDU5Y2Y3OGYwZWE1NzUzNWQ2YjFjZDc0NGMxZWU2MmQ3MjY1NzJmNTE0MzI=
+    ttl:
+      access-token: 3600000
+      refresh-token: 86400000
+logging:
+  level:
+    root: trace
