@@ -22,11 +22,15 @@ public class AuthService {
 
   @Transactional
   public AuthResponse login(LoginInput loginInput) {
-    final Optional<AppUser> userOpt = userService.findByUsername(loginInput.getUsername());
+    final Optional<AppUser> userOpt = userService.findByUsername(
+        loginInput.getUsername()
+    );
     if (userOpt.isEmpty()) {
       throw new RuntimeException("User not found");
     }
-    final JwtToken jwtTokens = jwtProvider.createTokens(loginInput.getUsername());
+    final JwtToken jwtTokens = jwtProvider.createTokens(
+        loginInput.getUsername()
+    );
     return AuthResponse.builder()
         .accessToken(jwtTokens.accessToken())
         .refreshToken(jwtTokens.refreshToken())
@@ -42,7 +46,9 @@ public class AuthService {
         signUpInput.getPassword(),
         signUpInput.getName()
     );
-    final JwtToken jwtTokens = jwtProvider.createTokens(signUpInput.getUsername());
+    final JwtToken jwtTokens = jwtProvider.createTokens(
+        signUpInput.getUsername()
+    );
     userService.save(appUser);
     return AuthResponse.builder()
         .accessToken(jwtTokens.accessToken())

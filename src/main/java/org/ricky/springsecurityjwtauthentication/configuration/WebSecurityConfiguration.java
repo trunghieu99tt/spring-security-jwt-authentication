@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.ricky.springsecurityjwtauthentication.jwt.JwtAccessDeniedHandler;
 import org.ricky.springsecurityjwtauthentication.jwt.JwtAuthenticationEntryPoint;
 import org.ricky.springsecurityjwtauthentication.jwt.JwtAuthenticationFilter;
-import org.ricky.springsecurityjwtauthentication.jwt.JwtProvider;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -21,9 +21,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 @EnableMethodSecurity(securedEnabled = true, prePostEnabled = false)
 public class WebSecurityConfiguration {
-  private final JwtProvider jwtProvider;
-  private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
   private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+  private final JwtAuthenticationFilter jwtAuthenticationFilter;
+  private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
@@ -49,7 +49,7 @@ public class WebSecurityConfiguration {
         )
         .csrf(AbstractHttpConfigurer::disable)
         .exceptionHandling(
-            httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer
+            exceptionHandlingConfigurer -> exceptionHandlingConfigurer
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler)
         )
@@ -73,7 +73,7 @@ public class WebSecurityConfiguration {
         )
         .csrf(AbstractHttpConfigurer::disable)
         .exceptionHandling(
-            httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer
+            exceptionHandlingConfigurer -> exceptionHandlingConfigurer
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler)
         )
@@ -83,13 +83,19 @@ public class WebSecurityConfiguration {
                 .authenticated()
         )
         .addFilterBefore(
-            jwtAuthenticationFilter(), // change to use jwtAuthenticationFilter bean
+            jwtAuthenticationFilter,
             UsernamePasswordAuthenticationFilter.class
         );
     return http.build();
   }
 
-  private JwtAuthenticationFilter jwtAuthenticationFilter() {
-    return new JwtAuthenticationFilter(jwtProvider);
+  @Bean
+  public FilterRegistrationBean<JwtAuthenticationFilter> tenantFilterRegistration(
+      JwtAuthenticationFilter jwtAuthenticationFilter
+  ) {
+    FilterRegistrationBean<JwtAuthenticationFilter> registration =
+        new FilterRegistrationBean<>(jwtAuthenticationFilter);
+    registration.setEnabled(false);
+    return registration;
   }
 }
